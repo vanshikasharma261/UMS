@@ -4,7 +4,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
 import { hash } from 'crypto';
-import { User } from 'generated/prisma/client';
+import { Role, User } from 'generated/prisma/client';
 
 function sanitizeUser(user: User) {
     const { password, isDeleted, ...rest } = user;
@@ -35,6 +35,15 @@ export class UserService {
         console.log("Type of user is: ", typeof user);
         console.log("Here is the user: ", user);
         return sanitizeUser(user);
+    }
+    async getMe(user: { id: string, email: string, role: Role }) {
+        const data = await this.prisma.user.findUnique({
+            where: { id: user.id }
+        });
+        if (!user) {
+            throw new NotFoundException('User Not Found!');
+        }
+        return sanitizeUser(data!);
     }
     async createUser(data: CreateUserDto) {
         const find = await this.prisma.user.findUnique({

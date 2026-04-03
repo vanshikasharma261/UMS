@@ -1,17 +1,18 @@
 ### List all users
 GET http://localhost:3000/user
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZTc0MTdkZi1hMWNlLTQ1NDUtODUyOS1kNTRjNmFjYTBmODAiLCJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc3NTEzMjEyOCwiZXhwIjoxNzc1MTMyNDI4fQ.e0TSDciMPviMi_BdQFejWV-WpTkdGWVbG82D59nG_C4
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZTc0MTdkZi1hMWNlLTQ1NDUtODUyOS1kNTRjNmFjYTBmODAiLCJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc3NTE5OTUxNCwiZXhwIjoxNzc1MTk5ODE0fQ.MD9an3KDqPLrSPoyhKdosyQK6huHoVSl2CGrO0FgXq4
 ### Create a user
 POST http://localhost:3000/user
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZTc0MTdkZi1hMWNlLTQ1NDUtODUyOS1kNTRjNmFjYTBmODAiLCJlbWFpbCI6ImFkbWluQGdtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc3NTE5OTUxNCwiZXhwIjoxNzc1MTk5ODE0fQ.MD9an3KDqPLrSPoyhKdosyQK6huHoVSl2CGrO0FgXq4
 Content-Type: application/json
 
 {
-    "firstName": "Super",
-    "lastName": "Admin",
-    "email": "adminl@gmail.com",
-    "password": "Admin@123",
-    "gender": "male",
-    "role": "ADMIN",
+    "firstName": "Vanshika",
+    "lastName": "Sharma",
+    "email": "vanshika@gmail.com",
+    "password": "Vanshika@123",
+    "gender": "female",
+    "role": "USER",
     "street": "kheda bazaar",
     "city": "jagadhri",
     "state": "Haryana",
@@ -21,17 +22,20 @@ Content-Type: application/json
 
 ### Get a particular user
 GET http://localhost:3000/user/ae7417df-a1ce-4545-8529-d54c6aca0f80
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjM2VkY2U1Zi0wZWU3LTQyYWEtODg0MC01MWRmN2IzODhkNjYiLCJlbWFpbCI6ImtsLnJhaHVsQGdtYWlsLmNvbSIsInJvbGUiOiJVU0VSIiwiaWF0IjoxNzc1MjAyNTc3LCJleHAiOjE3NzUyMDI4Nzd9.G42pT1LKdNOsZbE61t3u7FVJhgSDhoR4vBb7ZkpPf-8
 
 ### Update a user
-PUT http://localhost:3000/user/ae7417df-a1ce-4545-8529-d54c6aca0f80
+PUT http://localhost:3000/user/c3edce5f-0ee7-42aa-8840-51df7b388d66
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjM2VkY2U1Zi0wZWU3LTQyYWEtODg0MC01MWRmN2IzODhkNjYiLCJlbWFpbCI6ImtsLnJhaHVsQGdtYWlsLmNvbSIsInJvbGUiOiJVU0VSIiwiaWF0IjoxNzc1MjAyNTc3LCJleHAiOjE3NzUyMDI4Nzd9.G42pT1LKdNOsZbE61t3u7FVJhgSDhoR4vBb7ZkpPf-8
 Content-Type: application/json
 
 {
-    "email":"admin@gmail.com"
+    "email":"kannaur@gmail.com"
 }
 
 ### Soft delete a user
 DELETE http://localhost:3000/user/fa04b60a-65d4-452b-9401-627cea25308a
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjM2VkY2U1Zi0wZWU3LTQyYWEtODg0MC01MWRmN2IzODhkNjYiLCJlbWFpbCI6ImtsLnJhaHVsQGdtYWlsLmNvbSIsInJvbGUiOiJVU0VSIiwiaWF0IjoxNzc1MjAyNTc3LCJleHAiOjE3NzUyMDI4Nzd9.G42pT1LKdNOsZbE61t3u7FVJhgSDhoR4vBb7ZkpPf-8
 
 
 ### login route
@@ -39,6 +43,10 @@ POST http://localhost:3000/auth/login
 Content-Type: application/json
 
 {
-    "email":"admin@gmail.com",
-    "password":"Admin@123"
+    "email":"kl.rahul@gmail.com",
+    "password":"Kannaur@123"
 }
+
+### get me request
+GET http://localhost:3000/user/getme
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjM2VkY2U1Zi0wZWU3LTQyYWEtODg0MC01MWRmN2IzODhkNjYiLCJlbWFpbCI6ImtsLnJhaHVsQGdtYWlsLmNvbSIsInJvbGUiOiJVU0VSIiwiaWF0IjoxNzc1MjAyNTc3LCJleHAiOjE3NzUyMDI4Nzd9.G42pT1LKdNOsZbE61t3u7FVJhgSDhoR4vBb7ZkpPf-8
