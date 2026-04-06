@@ -1,10 +1,7 @@
-import { asyncThunkCreator, createAsyncThunk, createSlice, isRejectedWithValue } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { CreateUser, EditUser, UserErrorResponse, UserResponse, UserState } from "../../types/user.types";
 import type { RootState } from "../../store/store";
 import { logout } from "../auth/authSlice";
-import type { Root } from "react-dom/client";
-
-
 
 const initialState: UserState = {
     loading: false,
@@ -104,6 +101,35 @@ export const editUser = createAsyncThunk<UserResponse, EditUser, { rejectValue: 
 
 });
 
+export const deleteUser = createAsyncThunk<UserResponse, string, { rejectValue: UserErrorResponse }>("user/deleteUser", async (id, thunkAPI) => {
+
+    const token = (thunkAPI.getState() as RootState).auth.token;
+    try {
+        const response = await fetch(`${API_URL}/user/${id}`, {
+            method: "DELETE",
+            headers: {
+                Authorization: "Bearer " + token,
+            },
+        });
+
+        if (!response.ok) {
+            const result: UserErrorResponse = await response.json();
+            if (result.statusCode == 401) {
+                thunkAPI.dispatch(logout());
+            }
+            return thunkAPI.rejectWithValue(result);
+        }
+
+        const result: UserResponse = await response.json();
+        return result;
+    }
+    catch (err) {
+        console.log("Error in deleting the user: ", err);
+        return thunkAPI.rejectWithValue({ message: "Something went wrong!" });
+    }
+
+});
+
 export const getUser = createAsyncThunk<UserResponse, string, { rejectValue: UserErrorResponse }>("user/fetchUser", async (id, thunkAPI) => {
     const token = (thunkAPI.getState() as RootState).auth.token;
     try {
@@ -131,7 +157,7 @@ export const getUser = createAsyncThunk<UserResponse, string, { rejectValue: Use
         return thunkAPI.rejectWithValue({ message: "Something went wrong!" });
     }
 
-})
+});
 
 const userSlice = createSlice({
     name: "user",
@@ -166,6 +192,14 @@ const userSlice = createSlice({
         }).addCase(getUser.rejected, (state, action) => {
             state.loading = false;
             state.error = action.payload?.message ?? "Something went wrong";
+        }).addCase(deleteUser.fulfilled, (state, action) => {
+            state.loading = false;
+            state.users = state.users?.filter(u => u.id !== action.payload.id) ?? null;
+        }).addCase(deleteUser.rejected, (state, action) => {
+            state.loading = false;
+            state.formError = action.payload?.message ?? "Something went wrong";
+        }).addCase(deleteUser.pending, (state, action) => {
+            state.loading = true;
         })
     }
 });

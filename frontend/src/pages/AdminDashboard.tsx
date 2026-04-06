@@ -1,46 +1,9 @@
-// import { useEffect } from "react";
-// import { useAppDispatch, useAppSelector } from "../store/hooks";
-// import { useNavigate } from "react-router-dom";
-// import { getUsers } from "../features/user/userSlice";
-// import type { UserResponse } from "../types/user.types";
-// import { clearError } from "../features/auth/authSlice";
-
-// export default function AdminDashboard() {
-//   const navigate = useNavigate();
-//   const dispatch = useAppDispatch();
-//   const users = useAppSelector((state) => state.user.users);
-//   const token = useAppSelector((state) => state.auth.token);
-
-//   useEffect(() => {
-//     dispatch(getUsers());
-//   }, []);
-
-//   useEffect(() => {
-//     if (!token) {
-//       navigate("/");
-//     }
-//   }, [token]);
-
-//   return (
-//     <div>
-//       <h1>Admin Dashboard</h1>
-
-//       {users &&
-//         users.map((user) => (
-//           <div key={user.id}>
-//             <span>{user.firstName}</span>
-//           </div>
-//         ))}
-//     </div>
-//   );
-// }
-
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { useNavigate } from "react-router-dom";
-import { getUsers } from "../features/user/userSlice";
-import type { UserResponse } from "../types/user.types";
+import { clearFormError, getUsers } from "../features/user/userSlice";
 import { clearError } from "../features/user/userSlice";
+import DeleteUser from "./DeleteUser";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -48,7 +11,8 @@ export default function AdminDashboard() {
   const users = useAppSelector((state) => state.user.users);
   const loading = useAppSelector((state) => state.user.loading);
   const error = useAppSelector((state) => state.user.error);
-  console.log("Error in admin page is: ", error);
+  const [deleteFlag, setDeleteFlag] = useState<boolean>(false);
+  const [deleteId, setDeleteId] = useState<string>("");
 
   const fetchUsers = async () => {
     const result = await dispatch(getUsers());
@@ -63,6 +27,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     dispatch(clearError());
+    dispatch(clearFormError());
     fetchUsers();
   }, []);
 
@@ -75,8 +40,8 @@ export default function AdminDashboard() {
   };
 
   const handleDelete = (id: string) => {
-    // wire up deleteUser thunk later
-    console.log("delete", id);
+    setDeleteFlag(true);
+    setDeleteId(id);
   };
 
   if (loading) {
@@ -157,7 +122,6 @@ export default function AdminDashboard() {
           + Create User
         </button>
       </div>
-
       {/* Table */}
       <div
         className="rounded-2xl overflow-hidden border"
@@ -267,6 +231,15 @@ export default function AdminDashboard() {
           </div>
         )}
       </div>
+      {deleteFlag && (
+        <DeleteUser
+          id={deleteId}
+          onCancel={() => setDeleteFlag(false)}
+          onSuccess={() => {
+            setDeleteFlag(false);
+          }}
+        />
+      )}
     </div>
   );
 }
