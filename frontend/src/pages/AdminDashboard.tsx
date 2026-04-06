@@ -39,6 +39,8 @@ import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { useNavigate } from "react-router-dom";
 import { getUsers } from "../features/user/userSlice";
+import type { UserResponse } from "../types/user.types";
+import { clearError } from "../features/user/userSlice";
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -46,6 +48,7 @@ export default function AdminDashboard() {
   const users = useAppSelector((state) => state.user.users);
   const loading = useAppSelector((state) => state.user.loading);
   const error = useAppSelector((state) => state.user.error);
+  console.log("Error in admin page is: ", error);
 
   const fetchUsers = async () => {
     const result = await dispatch(getUsers());
@@ -59,12 +62,12 @@ export default function AdminDashboard() {
   };
 
   useEffect(() => {
+    dispatch(clearError());
     fetchUsers();
   }, []);
 
   const handleEdit = (id: string) => {
-    // wire up editUser thunk later
-    console.log("edit", id);
+    navigate(`/admin/edit/${id}`);
   };
 
   const handleCreate = () => {

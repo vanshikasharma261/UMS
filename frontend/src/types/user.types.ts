@@ -17,8 +17,7 @@ export interface UserState {
     loading: boolean,
     error: string | null,
     users: UserResponse[] | null,
-    selectedUser: UserResponse | null,
-    formError: string | null
+    formError: string | null,
 }
 
 export interface UserErrorResponse {
@@ -41,11 +40,15 @@ export interface CreateUser {
 }
 
 export interface EditUser {
+    id: string,
     firstName: string,
     lastName: string,
     email: string,
-    gender: string,
-    password: string
+    street: string,
+    city: string,
+    state: string,
+    country: string,
+    zipCode: string,
 }
 
 

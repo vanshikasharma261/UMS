@@ -1,5 +1,5 @@
-import { createAsyncThunk, createSlice, isRejectedWithValue } from "@reduxjs/toolkit";
-import type { CreateUser, UserErrorResponse, UserResponse, UserState } from "../../types/user.types";
+import { asyncThunkCreator, createAsyncThunk, createSlice, isRejectedWithValue } from "@reduxjs/toolkit";
+import type { CreateUser, EditUser, UserErrorResponse, UserResponse, UserState } from "../../types/user.types";
 import type { RootState } from "../../store/store";
 import { logout } from "../auth/authSlice";
 import type { Root } from "react-dom/client";
@@ -10,13 +10,12 @@ const initialState: UserState = {
     loading: false,
     error: null,
     users: null,
-    selectedUser: null,
     formError: null,
 }
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-export const getUsers = createAsyncThunk<UserResponse[], void, { rejectValue: UserErrorResponse }>('user/fetchUser', async (_, thunkAPI) => {
+export const getUsers = createAsyncThunk<UserResponse[], void, { rejectValue: UserErrorResponse }>('user/fetchUsers', async (_, thunkAPI) => {
     const token = (thunkAPI.getState() as RootState).auth.token;
 
     try {
@@ -72,6 +71,66 @@ export const createUser = createAsyncThunk<UserResponse, CreateUser, { rejectVal
         console.log(err);
         return thunkAPI.rejectWithValue({ message: "Network Error" });
     }
+});
+
+export const editUser = createAsyncThunk<UserResponse, EditUser, { rejectValue: UserErrorResponse }>("user/editUser", async (data, thunkAPI) => {
+
+    const token = (thunkAPI.getState() as RootState).auth.token;
+    const { id, ...editData } = data;
+
+    try {
+
+        const response = await fetch(`${API_URL}/user/${data.id}`, {
+            method: "PUT",
+            headers: {
+                Authorization: "Bearer " + token,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(editData)
+        });
+        if (!response.ok) {
+            const result: UserErrorResponse = await response.json();
+            if (result.statusCode == 401) {
+                thunkAPI.dispatch(logout());
+            }
+            return thunkAPI.rejectWithValue(result);
+        }
+        const result: UserResponse = await response.json();
+        return result;
+    } catch (err) {
+        console.log("error in edit: ", err);
+        return thunkAPI.rejectWithValue({ message: "Something went wrong!" });
+    }
+
+});
+
+export const getUser = createAsyncThunk<UserResponse, string, { rejectValue: UserErrorResponse }>("user/fetchUser", async (id, thunkAPI) => {
+    const token = (thunkAPI.getState() as RootState).auth.token;
+    try {
+        const response = await fetch(`${API_URL}/user/${id}`, {
+            method: "GET",
+            headers: {
+                Authorization: "Bearer " + token
+            },
+        });
+
+        if (!response.ok) {
+            const result: UserErrorResponse = await response.json();
+            if (result.statusCode == 401) {
+                thunkAPI.dispatch(logout());
+            }
+
+            return thunkAPI.rejectWithValue(result);
+        }
+
+        const result: UserResponse = await response.json();
+        return result;
+    }
+    catch (err) {
+        console.log("Internal error in getting user: ", err);
+        return thunkAPI.rejectWithValue({ message: "Something went wrong!" });
+    }
+
 })
 
 const userSlice = createSlice({
@@ -84,7 +143,7 @@ const userSlice = createSlice({
         },
         clearFormError: (state) => {
             state.formError = null;
-        }
+        },
     },
     extraReducers: (builder) => {
         builder.addCase(getUsers.pending, (state) => {
@@ -102,6 +161,11 @@ const userSlice = createSlice({
         }).addCase(createUser.rejected, (state, action) => {
             state.loading = false;
             state.formError = action.payload?.message ?? "Something Went Wrong";
+        }).addCase(getUser.fulfilled, (state, action) => {
+            state.loading = false;
+        }).addCase(getUser.rejected, (state, action) => {
+            state.loading = false;
+            state.error = action.payload?.message ?? "Something went wrong";
         })
     }
 });
