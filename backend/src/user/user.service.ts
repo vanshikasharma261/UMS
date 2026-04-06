@@ -7,7 +7,7 @@ import { hash } from 'crypto';
 import { Role, User } from 'generated/prisma/client';
 
 function sanitizeUser(user: User) {
-    const { password, isDeleted, ...rest } = user;
+    const { password, isDeleted, createdAt, updatedAt, ...rest } = user;
     return rest;
 }
 
@@ -21,7 +21,8 @@ export class UserService {
         });
         console.log("Type of users is: ", typeof users);
         console.log("Here are the users: ", users);
-        return users;
+        const data = users.map((user) => sanitizeUser(user));
+        return data;
     }
     async getUser(id: string) {
         const user = await this.prisma.user.findUnique({

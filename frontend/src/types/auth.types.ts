@@ -18,3 +18,9 @@ export interface AuthState {
     loading: boolean
     error: string | null
 }
+
+export interface token {
+    sub: string,
+    role: string,
+    email: string
+}

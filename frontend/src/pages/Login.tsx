@@ -3,6 +3,8 @@ import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { loginUser, clearError } from "../features/auth/authSlice";
 import { useNavigate } from "react-router-dom";
 import type { Errors } from "../types/login.types";
+import { jwtDecode } from "jwt-decode";
+import type { token } from "../types/auth.types";
 
 export default function Login() {
   const dispatch = useAppDispatch();
@@ -16,12 +18,6 @@ export default function Login() {
   useEffect(() => {
     dispatch(clearError());
   }, []);
-
-  useEffect(() => {
-    if (token) {
-      navigate("/admin");
-    }
-  }, [token]);
 
   const validate = () => {
     const error: Errors = {};
@@ -43,13 +39,24 @@ export default function Login() {
     return Object.keys(error).length == 0;
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!validate()) {
       return;
     }
 
-    dispatch(loginUser(formData));
+    const result = await dispatch(loginUser(formData));
+    if (loginUser.fulfilled.match(result)) {
+      const payload = result.payload;
+      const decoded = jwtDecode<token>(payload.access_token);
+      if (decoded.role == "ADMIN") {
+        navigate("/admin");
+      }
+      if (decoded.role == "USER") {
+        navigate("/user");
+      }
+    }
+    console.log(result);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
